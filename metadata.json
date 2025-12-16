@@ -1,0 +1,7 @@
+{
+  "name": "Copy of BioNurse Pro",
+  "description": "An advanced AI-powered medical assistant and health management platform created by Akin S. Sokpah.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
