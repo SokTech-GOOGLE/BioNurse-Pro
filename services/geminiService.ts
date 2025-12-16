@@ -1,19 +1,20 @@
+
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { GEMINI_MODEL } from "../constants";
 
-// Initialize Gemini Client
-// NOTE: In a real production build, ensure API_KEY is set in Vercel environment variables.
-const apiKey = process.env.API_KEY || ''; 
-
-const ai = new GoogleGenAI({ apiKey });
-
+// Initialize Gemini Client inside the function to pick up environment variables dynamically
 export const generateMedicalResponse = async (
   prompt: string, 
   history: string[] = []
 ): Promise<string> => {
-  if (!apiKey) {
+  const geminiApiKey = process.env.GEMINI_API_KEY || ''; // Use GEMINI_API_KEY
+  const openaiApiKey = process.env.OPENAI_API_KEY || '';  // Optional: if you also want OpenAI
+
+  if (!geminiApiKey) {
     return "Configuration Error: Gemini API Key is missing. Please check your environment variables.";
   }
+
+  const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
   try {
     // Construct a context-aware prompt
