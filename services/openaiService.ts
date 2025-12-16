@@ -1,12 +1,12 @@
 // OpenAI Integration
-// Note: In a production environment, API calls should be routed through a backend 
-// to protect the API key. For this Vercel deployment structure, we use the env variable.
+// Note: For production, always protect the API key by routing through a backend.
 
 export const generateOpenAIResponse = async (
   prompt: string, 
   history: { role: string; text: string }[] = []
 ): Promise<string> => {
-  const apiKey = process.env.OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY;
+  // Use environment variables safely
+  const apiKey = process.env.OPENAI_API_KEY || process.env.REACT_APP_OPENAI_API_KEY || '';
 
   if (!apiKey) {
     return "Configuration Error: OpenAI API Key is missing in environment variables.";
@@ -17,11 +17,12 @@ export const generateOpenAIResponse = async (
     const messages = [
       {
         role: "system",
-        content: `You are BioNurse Pro, an advanced AI medical assistant. 
-        Your goal is to provide helpful, accurate, and empathetic health information.
-        1. Clarify you are an AI, not a doctor.
-        2. Advise emergency care for severe symptoms.
-        3. Be concise and professional.`
+        content: `You are BioNurse Pro, an advanced AI medical assistant.
+Your goal is to provide helpful, accurate, and empathetic health information.
+Guidelines:
+1. Always clarify you are an AI, not a doctor.
+2. Advise emergency care for severe symptoms (chest pain, breathing difficulty, severe bleeding).
+3. Be concise, professional, and empathetic.`
       },
       ...history.map(msg => ({
         role: msg.role === 'model' ? 'assistant' : 'user',
@@ -37,9 +38,9 @@ export const generateOpenAIResponse = async (
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o", // Using the latest efficient model
-        messages: messages,
-        temperature: 0.7,
+        model: "gpt-4o", // latest efficient model
+        messages,
+        temperature: 0.7
       })
     });
 
@@ -49,10 +50,10 @@ export const generateOpenAIResponse = async (
     }
 
     const data = await response.json();
-    return data.choices[0]?.message?.content || "No response generated.";
+    return data.choices?.[0]?.message?.content || "No response generated.";
 
   } catch (error: any) {
     console.error("OpenAI API Error:", error);
-    return `Error connecting to OpenAI: ${error.message}. Please check your API Key or quota.`;
+    return `Error connecting to OpenAI: ${error.message}. Please check your API key or quota.`;
   }
 };
